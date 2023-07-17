@@ -26,3 +26,5 @@ options.add_experimental_option("useAutomationExtension", False)
 driver = webdriver.Chrome(options)
 driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
 ```
+
+## SELENIUM VIRTUAL AUTHENTICATOR?!?!

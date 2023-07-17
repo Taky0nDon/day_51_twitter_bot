@@ -60,17 +60,28 @@ class InternetSpeedTwitterBot:
         for cookie in twitter_cookies:
             self.driver.add_cookie(json.loads(cookie))
         twitter_cookies_file.close()
+        time.sleep(3)
+        self.driver.refresh()
         time.sleep(1)
-
-        username_input = self.driver.find_element(By.TAG_NAME, "input")
-        next_button_element = self.driver.find_element(By.XPATH, '//*[text()="Next"]')
-        username_input.send_keys(TWITTER_USERNAME)
-        next_button_element.click()
+        close_button_elmnt = self.driver.find_element(By.CSS_SELECTOR, "div[aria-label='Close']")
+        close_button_elmnt.click()
         time.sleep(1)
-
-        pw_form = self.driver.find_element(By.NAME, "password")
-        pw_form.send_keys(TWITTER_PASS, Keys.ENTER)
-
+        #
+        # username_input = self.driver.find_element(By.TAG_NAME, "input")
+        # next_button_element = self.driver.find_element(By.XPATH, '//*[text()="Next"]')
+        # username_input.send_keys(TWITTER_USERNAME)
+        # next_button_element.click()
+        # time.sleep(1)
+        #
+        # pw_form = self.driver.find_element(By.NAME, "password")
+        # pw_form.send_keys(TWITTER_PASS, Keys.ENTER)
+        # time.sleep(1)
+        #
+        tweet_editor_css_path = 'div.notranslate.public-DraftEditor-content'
+        tweet_editor = self.driver.find_element(By.CSS_SELECTOR, tweet_editor_css_path)
+        tweet_editor.send_keys("This tweet was made by selenium.")
+        tweet_button_element = self.driver.find_element(By.XPATH, '//*[text()="Tweet"]')
+        tweet_button_element.click()
 
 
 
@@ -79,11 +90,10 @@ bot = InternetSpeedTwitterBot()
 # print(bot.down_result, bot.up_result)
 # bot.driver.quit()
 bot.tweet_at_isp()
-input("Hit ENTER to get cookies.")
+input("Hit ENTER to finish and get cookies.")
 with open("twittercookies.txt", "w") as file:
     cookies = bot.driver.get_cookies()
     for cookie in cookies:
         cookie_string = json.dumps(cookie)
         file.write(f"{cookie_string}\n")
-input("Cookies acquired. Hit ENTER to continue.")
 bot.driver.quit()
