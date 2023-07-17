@@ -24,16 +24,20 @@ class InternetSpeedTwitterBot:
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option("useAutomationExtension", False)
+        self.wait_time = 100
         self.driver = webdriver.Chrome(options=options)
         self.driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
         self.driver.set_window_position(500, 0)
-        self.wait = WebDriverWait(self.driver, 100)
+        self.wait = WebDriverWait(self.driver, self.wait_time)  # make this be returned by a method so you can change the wait time
         self.down_result = None
         self.up_result = None
 
+    def set_wait_time(self, time_sec: int) -> None:
+        """Changes how long the wait attribute has before timing out"""
+        self.wait = WebDriverWait(self.driver, time_sec)
+
     def get_internet_speed(self):
         self.driver.get("https://www.speedtest.net")
-
         start_button = self.driver.find_element(By.CSS_SELECTOR, "span.start-text")
         start_button.click()
 
@@ -62,10 +66,12 @@ class InternetSpeedTwitterBot:
         twitter_cookies_file.close()
         time.sleep(3)
         self.driver.refresh()
-        time.sleep(1)
+        self.wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, "div[aria-label='Close']")))
         close_button_elmnt = self.driver.find_element(By.CSS_SELECTOR, "div[aria-label='Close']")
         close_button_elmnt.click()
-        time.sleep(1)
+        self.set_wait_time(10)
+        self.wait.until(ec.presence_of_element_located((By.CSS_SELECTOR, "div[testid='sheetDialog']")))
+        close_button_elmnt.click()
         #
         # username_input = self.driver.find_element(By.TAG_NAME, "input")
         # next_button_element = self.driver.find_element(By.XPATH, '//*[text()="Next"]')
@@ -81,7 +87,7 @@ class InternetSpeedTwitterBot:
         tweet_editor = self.driver.find_element(By.CSS_SELECTOR, tweet_editor_css_path)
         tweet_editor.send_keys("This tweet was made by selenium.")
         tweet_button_element = self.driver.find_element(By.XPATH, '//*[text()="Tweet"]')
-        tweet_button_element.click()
+        # tweet_button_element.click()
 
 
 
